@@ -1,0 +1,24 @@
+ticket_id,event_type,ts
+T001,assigned,2026-11-02 09:02:00
+T001,first_response,2026-11-02 09:15:00
+T001,resolved,2026-11-02 10:00:00
+T002,assigned,2026-11-02 09:31:00
+T002,first_response,2026-11-02 09:50:00
+T002,resolved,2026-11-02 10:20:00
+T003,assigned,2026-11-02 10:05:00
+T003,first_response,2026-11-02 10:20:00
+T003,resolved,2026-11-02 14:30:00
+T004,assigned,2026-11-02 11:10:00
+T004,first_response,2026-11-02 11:30:00
+T004,resolved,2026-11-02 13:00:00
+T005,assigned,2026-11-02 16:30:00
+T005,first_response,2026-11-02 17:00:00
+T006,assigned,2026-11-02 17:20:00
+T006,first_response,2026-11-02 19:30:00
+T006,resolved,2026-11-03 01:30:00
+T007,assigned,2026-11-03 10:01:00
+T007,first_response,2026-11-03 10:05:00
+T007,resolved,2026-11-03 10:40:00
+T008,assigned,2026-11-03 14:05:00
+T008,first_response,2026-11-03 14:10:00
+T008,resolved,2026-11-03 16:00:00
