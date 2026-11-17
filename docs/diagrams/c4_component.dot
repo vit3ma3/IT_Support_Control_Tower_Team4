@@ -1,0 +1,66 @@
+// IT Support Control Tower — C4 Component (C3): контейнер «Модуль импорта и проверки CSV».
+// Рендер: dot -Tpng -Gdpi=170 c4_component.dot -o ../images/c4_component.png
+digraph c4_component {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.5, ranksep=0.7, splines=true, newrank=true, pad=0.3,
+         label=<<b>IT Support Control Tower — C4 Component (C3): модуль импорта и проверки CSV</b>>, labelloc=t, fontsize=20]
+  node  [shape=box, style="rounded,filled", fontname="Arial", fontsize=11, fontcolor=white, margin="0.18,0.12", width=2.9, penwidth=1.5]
+  edge  [fontname="Arial", fontsize=10, color="#6E7B8B", fontcolor="#4A5563", arrowsize=0.8]
+
+  node [fillcolor="#0D4778", color="#0D4778"]
+  analyst [label=<<b>Аналитик</b><br/><font point-size="9">[Person]</font><br/>Выбирает файлы, смотрит итог и протокол>]
+
+  node [fillcolor="#8C8296", color="#8C8296"]
+  csv [label=<<b>Синтетические CSV-файлы</b><br/><font point-size="9">[Внешний источник]</font><br/>tickets, events, sla_targets>]
+
+  node [fillcolor="#20A4D6", color="#1686B3"]
+  refs    [label=<<b>2. Справочники и нормативы SLA</b><br/><font point-size="9">[Container]</font><br/>Очереди, исполнители, нормативы P1–P3>]
+  journal [label=<<b>5. Журнал загрузок и расчётов</b><br/><font point-size="9">[Container]</font><br/>Итоги загрузки, протокол ошибок>]
+  ib      [label=<<b>Информационная база 1С</b><br/><font point-size="9">[Container: хранилище данных]</font><br/>Регистры обращений и событий>, shape=cylinder, style=filled, height=1.1]
+
+  subgraph cluster_import {
+    label=<<b>1. Модуль импорта и проверки CSV</b><br/><font point-size="10">Container: обработка 1С, серверный модуль</font>>
+    fontcolor="#0D4778"; fontsize=14; style="rounded,dashed"; color="#8C8C8C"; margin=22
+    node [fillcolor="#7FCCEB", color="#1686B3", fontcolor="#0B3350"]
+    form [label=<<b>Форма «Импорт данных»</b><br/><font point-size="9">[Component: управляемая форма, клиент]</font><br/>Выбор файлов, итог загрузки,<br/>протокол ошибок>]
+    k1 [label=<<b>К1. Читатель CSV</b><br/><font point-size="9">[Component]</font><br/>UTF-8, разделитель «,», заголовок,<br/>единый формат даты-времени>]
+    k2 [label=<<b>К2. Валидатор структуры</b><br/><font point-size="9">[Component] V1, V2</font><br/>Колонки и обязательные поля>]
+    k3 [label=<<b>К3. Валидатор ссылок</b><br/><font point-size="9">[Component] V3</font><br/>Очереди, исполнители, обращения>]
+    k4 [label=<<b>К4. Валидатор хронологии</b><br/><font point-size="9">[Component] V4</font><br/>created_at ≤ first_response ≤ resolved,<br/>created_at ≤ closed_at>]
+    k5 [label=<<b>К5. Валидатор уникальности</b><br/><font point-size="9">[Component] V5</font><br/>Один first_response и один resolved>]
+    k6 [label=<<b>К6. Проверка нормативов SLA</b><br/><font point-size="9">[Component] V6</font><br/>Норматив есть для каждого приоритета>]
+    k7 [label=<<b>К7. Загрузчик</b><br/><font point-size="9">[Component]</font><br/>Идемпотентная запись по ключам<br/>ADR-0003; обращение целиком>]
+    k8 [label=<<b>К8. Протоколист</b><br/><font point-size="9">[Component]</font><br/>Итоги: принято, пропущено,<br/>отклонено; строки ошибок>]
+  }
+
+  { rank=same; csv; k1 }
+  { rank=same; k2; k3; k4; k5; k6 }
+  { rank=same; k7; k8 }
+
+  analyst -> form [label="Выбор файлов, «Загрузить»"]
+  form -> k1 [label="Файлы"]
+  csv -> k1 [label="CSV", constraint=false]
+  k1 -> k2 [label="Строки с заголовком"]
+  k2 -> k3; k2 -> k4; k2 -> k5; k2 -> k6
+  k3 -> k7; k4 -> k7; k5 -> k7; k6 -> k7 [label="Обращения\nбез ошибок"]
+  k3 -> refs [label="Есть ли очередь\nи исполнитель", style=dashed, constraint=false]
+  k6 -> refs [label="Нормативы", style=dashed, constraint=false]
+  k3 -> k8 [style=dotted, arrowhead=none, constraint=false]
+  k2 -> k8 [label="Ошибки проверок", style=dotted, constraint=false]
+  k7 -> k8 [label="Итоги записи", constraint=false]
+  k7 -> ib [label="Новые обращения и события;\nдубли пропускаются"]
+  k8 -> journal [label="Запись журнала"]
+  k8 -> form [label="Итог и протокол", constraint=false]
+  journal -> ib [style=invis]
+
+  legend [shape=plaintext, style="", fontcolor=black, label=<
+    <table border="1" cellborder="0" cellspacing="3" color="#B0B0B0" bgcolor="white">
+      <tr><td colspan="2"><b>Легенда</b></td></tr>
+      <tr><td bgcolor="#0D4778" width="22"> </td><td align="left">Человек (Person)</td></tr>
+      <tr><td bgcolor="#7FCCEB"> </td><td align="left">Компонент модуля импорта (каждый — задача плана)</td></tr>
+      <tr><td bgcolor="#20A4D6"> </td><td align="left">Другие контейнеры системы</td></tr>
+      <tr><td bgcolor="#8C8296"> </td><td align="left">Внешний источник</td></tr>
+      <tr><td colspan="2" align="left">Пунктир — чтение справочников; точки — передача ошибок в протокол</td></tr>
+    </table>>]
+  { rank=sink; legend }
+  ib -> legend [style=invis]
+}
