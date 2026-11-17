@@ -63,7 +63,15 @@ def validate(tickets, events, targets):
     return accepted, errors
 
 
-def metrics(tickets, events, targets):
+def status(minutes, created, norm, period_end):
+    """Нарушение: факт > норматива. Нет события: срок истёк к концу периода — нарушение, иначе не определено."""
+    if minutes is not None:
+        return minutes > norm
+    return True if created + timedelta(minutes=norm) < period_end else None
+
+
+def metrics(tickets, events, targets, period=PERIOD):
+    period_end = datetime.strptime(period[1], "%Y-%m-%d") + timedelta(days=1)
     rows = []
     for t in tickets:
         ev = {e["event_type"]: ts(e["ts"]) for e in events[t["ticket_id"]]}
@@ -77,8 +85,8 @@ def metrics(tickets, events, targets):
             "resolved": ev.get("resolved"),
             "resp": resp,
             "res": res,
-            "resp_breach": None if resp is None else resp > resp_t,
-            "res_breach": None if res is None else res > res_t,
+            "resp_breach": status(resp, created, resp_t, period_end),
+            "res_breach": status(res, created, res_t, period_end),
         })
     return rows
 
@@ -113,14 +121,16 @@ def rate(flags):
 
 
 def summary(rows):
-    both = [r for r in rows if r["resp"] is not None and r["res"] is not None]
+    # breach_rate: обращения с хотя бы одним нарушением / обращения, где хотя бы одно нарушение или оба показателя определены
+    decided = [r for r in rows if r["resp_breach"] or r["res_breach"]
+               or (r["resp_breach"] is not None and r["res_breach"] is not None)]
     return {
         "обращений": len(rows),
         "resp_avg": avg(r["resp"] for r in rows),
         "resolve_avg": avg(r["res"] for r in rows),
         "breach_resp, %": rate(r["resp_breach"] for r in rows),
         "breach_resolve, %": rate(r["res_breach"] for r in rows),
-        "breach_rate, %": rate(r["resp_breach"] or r["res_breach"] for r in both),
+        "breach_rate, %": rate(bool(r["resp_breach"] or r["res_breach"]) for r in decided),
     }
 
 
@@ -163,7 +173,8 @@ def main():
     print("\nИтого:", summary(rows))
 
     load = daily_load(rows, PERIOD)
-    print("\nЗагрузка по дням:", sorted(load.items()), "средняя:", avg(load.values()))
+    print("\nЗагрузка по дням:", sorted(load.items()), "средняя:", avg(load.values()),
+          "разброс: макс", max(load.values()), "мин", min(load.values()))
 
     print("\n== Фильтры")
     for name, cond, period in [
