@@ -1,0 +1,34 @@
+@startuml c4_context
+!include <C4/C4_Context>
+!include c4_style.iuml
+
+title IT Support Control Tower — C4 System Context (C1), v2
+
+Person(manager, "Руководитель ИТ-поддержки", "Контролирует SLA и загрузку, настраивает нормативы SLA")
+Person(queue_lead, "Руководитель очереди", "Анализирует показатели своей очереди")
+Person(analyst, "Аналитик", "Импортирует и проверяет данные, готовит и выгружает отчёт")
+Person(admin, "Администратор 1С", "Ведёт справочники очередей и исполнителей, назначает роли")
+
+System(system, "IT Support Control Tower", "1С:Предприятие 8.3. Импорт и проверка данных, расчёт SLA и загрузки, отчёт «SLA и загрузка», визуализация и экспорт внутри 1С")
+
+System_Ext(csv, "Синтетические CSV-файлы", "tickets, events, sla_targets: обращения, события и нормативы")
+System_Ext(export, "Получатель выгрузки", "Коллеги или BI-инструмент, получающие агрегированный CSV")
+System_Ext(sd, "Service Desk (Jira, OTRS)", "Будущий источник данных. Не входит в MVP (W-01)", $tags="future")
+
+Rel_D(manager, system, "Просмотр KPI и графиков, настройка нормативов SLA")
+Rel_D(queue_lead, system, "Просмотр отчёта по своей очереди")
+Rel_D(analyst, system, "Импорт, фильтры, экспорт CSV")
+Rel_D(admin, system, "Справочники и роли")
+Rel_R(csv, system, "Обращения, события, нормативы", "CSV, UTF-8")
+Rel_R(system, export, "Агрегированные показатели", "CSV, 6 полей")
+Rel_U(sd, system, "Только после согласования", $tags="future")
+
+legend right
+<color:#000000>**Легенда**</color>
+<back:#0D4778><color:#FFFFFF> Человек (Person) </color></back>
+<back:#20A4D6><color:#FFFFFF> Система IT Support Control Tower </color></back>
+<back:#8C8296><color:#FFFFFF> Внешняя система </color></back>
+<back:#D9D4DE><color:#4A4352> Внешняя система вне MVP, пунктир </color></back>
+<color:#6E6678>– – –</color><color:#000000> пунктирная связь: будущее взаимодействие, вне MVP</color>
+endlegend
+@enduml

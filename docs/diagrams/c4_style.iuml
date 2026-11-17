@@ -1,0 +1,18 @@
+' Общий стиль диаграмм C4 команды 4: как на схеме C4 Container v1 (R2)
+skinparam defaultFontName "Arial"
+skinparam dpi 170
+skinparam legendBackgroundColor #FFFFFF
+skinparam legendBorderColor #B0B0B0
+skinparam legendFontSize 12
+UpdateElementStyle("person", $bgColor="#0D4778", $borderColor="#0D4778")
+UpdateElementStyle("system", $bgColor="#20A4D6", $borderColor="#1686B3")
+UpdateElementStyle("container", $bgColor="#20A4D6", $borderColor="#1686B3")
+UpdateElementStyle("component", $bgColor="#7FCCEB", $fontColor="#0B3350", $borderColor="#1686B3")
+UpdateElementStyle("external_system", $bgColor="#8C8296", $borderColor="#8C8296")
+UpdateElementStyle("external_container", $bgColor="#8C8296", $borderColor="#8C8296")
+UpdateBoundaryStyle($elementName="system", $fontColor="#0D4778", $borderColor="#8C8C8C")
+UpdateBoundaryStyle($elementName="container", $fontColor="#0D4778", $borderColor="#8C8C8C")
+AddElementTag("future", $bgColor="#D9D4DE", $fontColor="#4A4352", $borderColor="#8C8296", $borderStyle=DashedLine())
+AddRelTag("future", $lineStyle=DashedLine(), $textColor="#6E6678", $lineColor="#8C8296")
+skinparam legendFontColor #000000
+HIDE_STEREOTYPE()

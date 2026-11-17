@@ -1,0 +1,4 @@
+priority,response_min,resolve_min
+P1,15,60
+P2,30,240
+P3,120,480

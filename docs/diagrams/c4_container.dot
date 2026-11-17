@@ -1,0 +1,69 @@
+// IT Support Control Tower — C4 Container (C2), v2. Рендер: dot -Tpng -Gdpi=170 c4_container.dot -o ../images/c4_container.png
+digraph c4_container {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.6, ranksep=0.9, splines=true, newrank=true, pad=0.3,
+         label=<<b>IT Support Control Tower — C4 Container (C2), v2</b>>, labelloc=t, fontsize=20]
+  node  [shape=box, style="rounded,filled", fontname="Arial", fontsize=11, fontcolor=white, margin="0.18,0.12", width=2.8, penwidth=1.5]
+  edge  [fontname="Arial", fontsize=10, color="#6E7B8B", fontcolor="#4A5563", arrowsize=0.8]
+
+  // Люди
+  node [fillcolor="#0D4778", color="#0D4778"]
+  analyst    [label=<<b>Аналитик</b><br/><font point-size="9">[Person]</font><br/>Импорт, проверка, отчёт, экспорт>]
+  admin      [label=<<b>Администратор 1С</b><br/><font point-size="9">[Person]</font><br/>Справочники и роли>]
+  manager    [label=<<b>Руководитель ИТ-поддержки</b><br/><font point-size="9">[Person]</font><br/>KPI, SLA, загрузка; нормативы SLA>]
+  queue_lead [label=<<b>Руководитель очереди</b><br/><font point-size="9">[Person]</font><br/>Показатели своей очереди>]
+
+  // Внешние системы
+  node [fillcolor="#8C8296", color="#8C8296"]
+  csv        [label=<<b>Синтетические CSV-файлы</b><br/><font point-size="9">[Внешний источник]</font><br/>tickets, events, sla_targets>]
+  export_rcv [label=<<b>Получатель выгрузки</b><br/><font point-size="9">[Внешняя система]</font><br/>Коллеги или BI-инструмент>]
+  sd         [label=<<b>Service Desk (Jira, OTRS)</b><br/><font point-size="9">[Внешняя система]</font><br/>Вне MVP (W-01)>, fillcolor="#D9D4DE", fontcolor="#4A4352", style="rounded,filled,dashed"]
+
+  subgraph cluster_sys {
+    label=<<b>IT Support Control Tower</b><br/><font point-size="10">Система на платформе 1С:Предприятие 8.3</font>>
+    fontcolor="#0D4778"; fontsize=14; style="rounded,dashed"; color="#8C8C8C"; margin=24
+    node [fillcolor="#20A4D6", color="#1686B3"]
+    import  [label=<<b>1. Модуль импорта и проверки CSV</b><br/><font point-size="9">[Container: обработка 1С]</font><br/>Чтение tickets, events, sla_targets<br/>6 типов проверок, идемпотентная запись<br/>Протокол ошибок>]
+    refs    [label=<<b>2. Справочники и нормативы SLA</b><br/><font point-size="9">[Container: справочники, регистр сведений]</font><br/>Очереди, исполнители, приоритеты<br/>Нормативы P1–P3 (настраиваемые)>]
+    report  [label=<<b>4. Отчёт «SLA и загрузка» и экспорт</b><br/><font point-size="9">[Container: управляемая форма, СКД]</font><br/>Свод и детализация, диаграмма SLA,<br/>нагрузка, 4 фильтра, экспорт CSV>]
+    calc    [label=<<b>3. Расчёт SLA и загрузки</b><br/><font point-size="9">[Container: общий модуль, регламентное задание]</font><br/>Реакция и решение, нарушения раздельно<br/>Загрузка по дням; пересчёт по расписанию>]
+    journal [label=<<b>5. Журнал загрузок и расчётов</b><br/><font point-size="9">[Container: регистр сведений, форма]</font><br/>Кто, когда, сколько принято,<br/>отклонено, пересчитано; пороги>]
+    ib      [label=<<b>Информационная база 1С</b><br/><font point-size="9">[Container: хранилище данных]</font><br/>Обращения, события, нормативы,<br/>результаты расчёта, журнал>, shape=cylinder, style=filled, height=1.2]
+  }
+
+  { rank=same; analyst; admin; manager; queue_lead }
+  { rank=same; csv; import; refs; report; export_rcv }
+  { rank=same; sd; calc; journal }
+  import -> calc [style=invis]
+  refs -> journal [style=invis]
+  analyst -> csv [style=invis]
+
+  analyst    -> import  [label="Загрузка CSV"]
+  analyst    -> report  [label="Фильтры, экспорт"]
+  admin      -> refs    [label="Справочники, роли"]
+  manager    -> refs    [label="Нормативы SLA"]
+  manager    -> report  [label="Просмотр KPI"]
+  queue_lead -> report  [label="Отчёт по очереди"]
+  csv        -> import  [label="CSV, UTF-8", constraint=false]
+  import     -> refs    [label="Сверка ссылок\nи нормативов", constraint=false]
+  report     -> export_rcv [label="CSV, 6 полей", constraint=false]
+  import     -> journal [label="Итоги и ошибки"]
+  import     -> ib      [label="Обращения\nи события"]
+  calc       -> refs    [label="Нормативы", constraint=false]
+  calc       -> ib      [label="Факты → результаты"]
+  calc       -> journal [label="Итоги пересчёта", constraint=false]
+  report     -> ib      [label="Результаты расчёта"]
+  journal    -> ib      [label="Записи журнала"]
+  sd         -> import  [label="Только после\nсогласования", style=dashed, color="#8C8296", constraint=false]
+
+  legend [shape=plaintext, style="", fontcolor=black, label=<
+    <table border="1" cellborder="0" cellspacing="3" color="#B0B0B0" bgcolor="white">
+      <tr><td colspan="2"><b>Легенда</b></td></tr>
+      <tr><td bgcolor="#0D4778" width="22"> </td><td align="left">Человек (Person)</td></tr>
+      <tr><td bgcolor="#20A4D6"> </td><td align="left">Контейнер системы = пакет работ 1–5</td></tr>
+      <tr><td bgcolor="#8C8296"> </td><td align="left">Внешняя система / источник</td></tr>
+      <tr><td bgcolor="#D9D4DE"> </td><td align="left">Внешняя система вне MVP, пунктирная связь</td></tr>
+      <tr><td colspan="2" align="left">Базовый вариант: визуализация внутри 1С (ADR-0001)</td></tr>
+    </table>>]
+  { rank=sink; legend }
+  ib -> legend [style=invis]
+}
