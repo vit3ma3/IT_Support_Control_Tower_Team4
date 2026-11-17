@@ -1,0 +1,34 @@
+# ОС и редакторы
+.DS_Store
+Thumbs.db
+ehthumbs.db
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+
+# Логи и временные файлы
+*.log
+logs/
+__pycache__/
+*.pyc
+
+# Окружение
+.env
+.env.local
+.env.*.local
+
+# 1С: информационные базы и выгрузки (в репозиторий — только выгрузка конфигурации в XML)
+*.1CD
+*.1CL
+*.cfl
+*.dt
+*.cf
+*.cfe
+*.lgf
+*.lgp
+1Cv8Log/
+1Cv8tmp/
+ConfigDumpInfo.xml
