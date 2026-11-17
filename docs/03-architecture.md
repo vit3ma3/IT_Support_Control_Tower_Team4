@@ -25,7 +25,7 @@
 | C2 Container | 5 функциональных контейнеров и ИБ; каждый контейнер — пакет работ | [c4-container.md](c4-container.md) | [c4_container.png](images/c4_container.png) (v2), [c4_container_v1.png](images/c4_container_v1.png) (v1, R2) |
 | C3 Component | Компоненты модуля импорта и проверки CSV; каждый компонент — задача плана | [c4-component.md](c4-component.md) | [c4_component.png](images/c4_component.png) |
 
-Исходники схем — [diagrams/](diagrams/): C1 — PlantUML C4, C2 и C3 — Graphviz. Рендер: `plantuml -tpng -o ../images c4_context.puml`, `dot -Tpng -Gdpi=170 c4_container.dot -o ../images/c4_container.png`.
+Исходники схем — [diagrams/](diagrams/): C1 — PlantUML C4, C2 и C3 — Graphviz с ручной раскладкой. Рендер: `plantuml -tpng -o ../images c4_context.puml`, `neato -n -Tpng -Gdpi=150 c4_container.dot -o ../images/c4_container.png`. Значение линий — в легенде каждой схемы.
 
 ## 3. Архитектурные решения (ADR)
 

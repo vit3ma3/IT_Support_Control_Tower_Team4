@@ -29,6 +29,9 @@ legend right
 <back:#20A4D6><color:#FFFFFF> Система IT Support Control Tower </color></back>
 <back:#8C8296><color:#FFFFFF> Внешняя система </color></back>
 <back:#D9D4DE><color:#4A4352> Внешняя система вне MVP, пунктир </color></back>
-<color:#6E6678>– – –</color><color:#000000> пунктирная связь: будущее взаимодействие, вне MVP</color>
+<color:#000000>**Линии**</color>
+<color:#000000>——▶ сплошная стрелка — связь в MVP (стрелка — направление данных или действия)</color>
+<color:#000000>- - ▶ пунктирная стрелка — возможная будущая связь, вне MVP</color>
+<color:#000000>┄┄ пунктирная рамка у блока — внешняя система вне MVP</color>
 endlegend
 @enduml
